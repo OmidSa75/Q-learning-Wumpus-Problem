@@ -1,10 +1,10 @@
-import pygame
-from config import *
+import numpy as np
+from utils.config import *
 
 
 class Board:
     def __init__(self, robot, holes, wumpus, gold):
-        self.board = []
+        self.board = np.zeros((ROWS, COLUMNS))
         self.holes = holes
         self.wumpus = wumpus
         self.gold = gold
@@ -103,6 +103,7 @@ class Game:
 
     def move(self, move_index):
         self.board.move(move_index)
+        return self.board.robot
 
     def end(self):
         return self.board.end_game()
