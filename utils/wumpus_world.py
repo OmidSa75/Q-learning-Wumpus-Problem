@@ -33,8 +33,8 @@ class Board:
                                           SQUARE_SIZE))
 
             win.blit(FONT.render('PIT', True, (0, 255, 255)),
-                     ((hole[0] * SQUARE_SIZE) + SQUARE_SIZE // 2,
-                      (hole[1] * SQUARE_SIZE) + SQUARE_SIZE // 2))
+                     ((hole[0] * SQUARE_SIZE + hole[0] * GAP) + SQUARE_SIZE // 2 - FONT.get_linesize()//2,
+                      (hole[1] * SQUARE_SIZE + hole[1] * GAP) + SQUARE_SIZE // 2 - FONT.get_linesize()//2))
 
     def draw_agent(self, win):
         agent = self.robot
@@ -49,11 +49,11 @@ class Board:
     def draw_wumpus(self, win):
         wumpus = self.wumpus
         win.blit(WUMPUS, (wumpus[0] * SQUARE_SIZE + WUMPUS.get_width() // 2,
-                        wumpus[1] * SQUARE_SIZE + WUMPUS.get_height() // 2))
+                          wumpus[1] * SQUARE_SIZE + WUMPUS.get_height() // 2))
 
     def move(self, move_index):
         moves = self.get_valid_moves()
-        print("Move index: {} | Moves : {}".format(move_index, moves))
+        # print("Move index: {} | Moves : {}".format(move_index, moves))
         if moves[move_index]:
             self.robot = moves[move_index]
         else:
@@ -85,6 +85,17 @@ class Board:
 
         return valid_moves
 
+    def reward(self):
+        good = [self.gold]
+        bad = [self.wumpus, *self.holes]
+
+        if self.robot in bad:
+            return -100
+        elif self.robot in good:
+            return 100
+        else:
+            return 1
+
 
 class Game:
     def __init__(self, win, robot, holes, wumpus, gold):
@@ -103,7 +114,10 @@ class Game:
 
     def move(self, move_index):
         self.board.move(move_index)
-        return self.board.robot
+        reward = self.board.reward()
+        end = self.board.end_game()
+
+        return self.board.robot, reward, end
 
     def end(self):
         return self.board.end_game()

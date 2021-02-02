@@ -18,6 +18,5 @@ class QLearning:
 
         new_value = (1 - self.alpha) * old_value + self.alpha * (reward + self.gamma * next_max)
         self.q_table[state[0], state[1], action] = new_value
-        print("Q_table optimized")
 
 
