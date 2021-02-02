@@ -26,30 +26,35 @@ class Board:
                     row * SQUARE_SIZE + row * GAP, col * SQUARE_SIZE + col * GAP, SQUARE_SIZE, SQUARE_SIZE))
 
     def draw_holes(self, win):
-        for hole in self.holes:
-            pygame.draw.rect(win, BLACK, (hole[0] * SQUARE_SIZE + hole[0] * GAP,
-                                          hole[1] * SQUARE_SIZE + hole[1] * GAP,
-                                          SQUARE_SIZE,
-                                          SQUARE_SIZE))
+        if self.holes:
+            for hole in self.holes:
+                if hole:
+                    pygame.draw.rect(win, BLACK, (hole[0] * SQUARE_SIZE + hole[0] * GAP,
+                                                  hole[1] * SQUARE_SIZE + hole[1] * GAP,
+                                                  SQUARE_SIZE,
+                                                  SQUARE_SIZE))
 
-            win.blit(FONT.render('PIT', True, (0, 255, 255)),
-                     ((hole[0] * SQUARE_SIZE + hole[0] * GAP) + SQUARE_SIZE // 2 - FONT.get_linesize()//2,
-                      (hole[1] * SQUARE_SIZE + hole[1] * GAP) + SQUARE_SIZE // 2 - FONT.get_linesize()//2))
+                    win.blit(FONT.render('PIT', True, (0, 255, 255)),
+                             ((hole[0] * SQUARE_SIZE + hole[0] * GAP) + SQUARE_SIZE // 2 - FONT.get_linesize()//2,
+                              (hole[1] * SQUARE_SIZE + hole[1] * GAP) + SQUARE_SIZE // 2 - FONT.get_linesize()//2))
 
     def draw_agent(self, win):
-        agent = self.robot
-        win.blit(ROBOT, (agent[0] * SQUARE_SIZE + ROBOT.get_width() // 2,
-                         agent[1] * SQUARE_SIZE + ROBOT.get_height() // 2))
+        if self.robot:
+            agent = self.robot
+            win.blit(ROBOT, (agent[0] * SQUARE_SIZE + ROBOT.get_width() // 2,
+                             agent[1] * SQUARE_SIZE + ROBOT.get_height() // 2))
 
     def draw_gold(self, win):
-        gold = self.gold
-        win.blit(GOLD, (gold[0] * SQUARE_SIZE + GOLD.get_width() // 2,
-                        gold[1] * SQUARE_SIZE + GOLD.get_height() // 2))
+        if self.gold:
+            gold = self.gold
+            win.blit(GOLD, (gold[0] * SQUARE_SIZE + GOLD.get_width() // 2,
+                            gold[1] * SQUARE_SIZE + GOLD.get_height() // 2))
 
     def draw_wumpus(self, win):
-        wumpus = self.wumpus
-        win.blit(WUMPUS, (wumpus[0] * SQUARE_SIZE + WUMPUS.get_width() // 2,
-                          wumpus[1] * SQUARE_SIZE + WUMPUS.get_height() // 2))
+        if self.wumpus:
+            wumpus = self.wumpus
+            win.blit(WUMPUS, (wumpus[0] * SQUARE_SIZE + WUMPUS.get_width() // 2,
+                              wumpus[1] * SQUARE_SIZE + WUMPUS.get_height() // 2))
 
     def move(self, move_index):
         moves = self.get_valid_moves()

@@ -2,6 +2,9 @@ import random
 import pygame
 from utils import config, Game, QLearning
 import logging
+import argparse
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s|%(levelname)s:  %(message)s')
 
 
 def get_row_col_from_mouse(pos):
@@ -11,24 +14,46 @@ def get_row_col_from_mouse(pos):
     return row, col
 
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s|%(levelname)s:  %(message)s')
+def main(opt):
     win = pygame.display.set_mode(config.BOARD_SIZE)
     pygame.display.set_caption('Wumpus World, Q learning')
     FPS = 60
 
     clock = pygame.time.Clock()
-    game = Game(win, (0, 0), [(1, 2), (3, 4)], (2, 0), (4, 1))
+    game = Game(win, None, None, None, None)
+
+    items = {"robot": None, "wumpus": None, "hole1": None, "hole2": None, "gold": None}
+    for i, item in enumerate(items.keys()):
+        run = True
+        logging.info(f"***SELECT {item}***")
+        while run:
+            clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
+                    row, col = get_row_col_from_mouse(pos)
+
+                    items[item] = (col, row)
+                    run = False
+                    break
+
+            game.reset(items['robot'], [items['hole1'], items['hole2']], items['wumpus'], items['gold'])
+            game.update()
+
     '''HyperParameters'''
-    epsilon = 0.95
-    alpha = 0.1
-    gamma = 0.9
+    epsilon = opt.epsilon
+    alpha = opt.lr
+    gamma = opt.gamma
 
     q_learner = QLearning(gamma, alpha)
     penalties = 0
 
-    for epoch in range(1, 10000):
-        game.reset((0, 4), [(1, 2), (3, 4)], (2, 0), (4, 1))
+    logging.info(f"\n\n{40 * '*'} start learning {40 * '*'}\n\n")
+    for epoch in range(1, opt.num_epochs+1):
+        game.reset(items['robot'], [items['hole1'], items['hole2']], items['wumpus'], items['gold'])
         while True:
             clock.tick(FPS)
             for event in pygame.event.get():
@@ -57,7 +82,22 @@ if __name__ == '__main__':
 
         if epoch % 100 == 0:
             logging.info(f"Epoch: {epoch}")
-            epsilon *= 0.9
-            alpha *= 0.9
+            if opt.decay:
+                epsilon *= 0.9
+                q_learner.alpha *= 0.9
 
-            logging.info(f"Learning Rate : {alpha} | Epsilon : {epsilon}")
+                logging.info(f"Learning Rate : {q_learner.alpha} | Epsilon : {epsilon}")
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--epsilon', type=float, default=0.5)
+    parser.add_argument('--lr', type=float, default=0.1, help="learning rate")
+    parser.add_argument('--gamma', type=float, default=0.9, help="discount factor")
+    parser.add_argument('--num_epochs', type=int, default=10000, help="Number of epochs")
+    parser.add_argument('--decay', action='store_true', default=True,
+                        help="If true, The learning rate and epsilon will be decrease during iterations")
+
+    opt = parser.parse_args()
+    main(opt)
+
