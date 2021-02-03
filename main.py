@@ -72,7 +72,7 @@ def main(opt):
 
             q_learner.optimize(state, action=action, next_state=next_state, reward=reward)
 
-            if reward == -10:
+            if reward == -100:
                 penalties += 1
 
             game.update()
