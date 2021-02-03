@@ -30,7 +30,7 @@ def main(opt):
             clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    run = False
+                    return
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
@@ -54,11 +54,12 @@ def main(opt):
     logging.info(f"\n\n{40 * '*'} start learning {40 * '*'}\n\n")
     for epoch in range(1, opt.num_epochs+1):
         game.reset(items['robot'], [items['hole1'], items['hole2']], items['wumpus'], items['gold'])
-        while True:
+        run = True
+        while run:
             clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    break
+                    return
 
             state = game.board.robot
 
@@ -81,7 +82,7 @@ def main(opt):
                 break
 
         if epoch % 100 == 0:
-            logging.info(f"Epoch: {epoch}")
+            logging.info(f"Epoch: {epoch}, Penalties: {penalties}")
             if opt.decay:
                 epsilon *= 0.9
                 q_learner.alpha *= 0.9
@@ -91,7 +92,7 @@ def main(opt):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epsilon', type=float, default=0.5)
+    parser.add_argument('--epsilon', type=float, default=0.95)
     parser.add_argument('--lr', type=float, default=0.1, help="learning rate")
     parser.add_argument('--gamma', type=float, default=0.9, help="discount factor")
     parser.add_argument('--num_epochs', type=int, default=10000, help="Number of epochs")
