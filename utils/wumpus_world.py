@@ -99,7 +99,7 @@ class Board:
         elif self.robot in good:
             return 100
         else:
-            return 1
+            return -1
 
 
 class Game:
